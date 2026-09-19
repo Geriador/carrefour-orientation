@@ -402,6 +402,7 @@ div.entree.a-venir{cursor:default}
 
 <footer class="pied">
   <p><strong>Carrefour Orientation</strong>, version <span id="version"></span>, conçu pour le collège Roger Martin du Gard de Bellême (M. Blanchet).</p>
+  <p class="source"><a href="#/sources">Sources et mises à jour</a> · <a href="#/prof">Espace professeur</a></p>
   <p>Les informations sur les formations proviennent des guides officiels de la rentrée 2026 (Onisep, régions Normandie, Centre-Val de Loire, Pays de la Loire). L'offre de la rentrée 2027 sera publiée au printemps 2027 : vérifiez toujours auprès de l'établissement, du professeur principal ou du psychologue de l'Éducation nationale.</p>
 </footer>
 
@@ -1673,6 +1674,7 @@ div.entree.a-venir{cursor:default}
 {"i":1218,"n":"Federation Amicales Laiques","v":"Nantes","d":"44","dn":"Loire-Atlantique","a":"Z","s":"c","t":null,"w":null,"ad":"2 a Rue de Madrid Bp74107","cp":"44041","int":false,"ih":null,"sec":false,"L":[],"src":[["rco","app",0]],"x":[],"ser":[],"f":{"app":[["Specialite animateur, mention animation socio-educative ou culturelle (BP JEPS)","BPJEPS","autre","1","https://catalogue-apprentissage.intercariforef.org/formation/69cdca00d55c5101fa9ae255",null,"Du 30/11/2026 au 10/12/2027.","Fal","2 a Rue de Madrid Bp74107, 44041 Nantes"]]},"appr":true,"geo":[47.21236,-1.54986,"rco"],"uaiF":"0442756G","km":203.8},
 {"i":1219,"n":"OGEC St Joseph et St Thomas d Acquin","v":"Ancenis","d":"44","dn":"Loire-Atlantique","a":"Z","s":"c","t":null,"w":null,"ad":"66 Rue du College Bp 109","cp":"44150","int":false,"ih":null,"sec":false,"L":[],"src":[["rco","app",0]],"x":[],"ser":[],"f":{"app":[["Aide-soignant (DIPLÔME D'ETAT)","Diplôme d'État ou autre diplôme","autre","1","https://catalogue-apprentissage.intercariforef.org/formation/6a0d13c4159b9300e177b503",null,"Du 24/08/2026 au 29/02/2028.","OGEC St Joseph et St Thomas d Acquin","66 Rue du College Bp 109, 44150 Ancenis"]]},"appr":true,"geo":[47.36615,-1.17599,"rco"],"uaiF":"0440149Y","uai":"0440149Y","km":171.2}
 ]}</script>
+<script type="application/json" id="jpo-integrees">[]</script>
 <script type="application/json" id="liens">{"dip":{
 "capa|Métiers de l'agriculture - Équins":["FOR.4572"],
 "capa|Métiers de l'agriculture - Ruminants":["FOR.4572"],
@@ -30606,7 +30608,7 @@ E9FDUpW6MmYYkchrh6kwOcORjTGpwnihT+A2kTdkvPs+NcbX5GxNTmXvhOHMJk6xVKibEEeb77Af2UuE
    ============================================================ */
 (function(){
 "use strict";
-var APP = window.APP = { version:"v018", vues:{}, menu:[] };
+var APP = window.APP = { version:"v019", vues:{}, menu:[] };
 
 /* ---------- Stockage local versionné ---------- */
 var CLE = "carrefour-orientation.v1";
@@ -30704,7 +30706,7 @@ APP.voix = {
 };
 
 /* ---------- Routeur ---------- */
-APP.enregistrer = function(nom, def){ APP.vues[nom] = def.rendu; if(def.menu){ APP.menu.push({nom:nom, titre:def.menu, ordre:(def.ordre!=null?def.ordre:50), bientot:!!def.bientot}); } };
+APP.enregistrer = function(nom, def){ APP.vues[nom] = def.rendu; if(def.menu){ APP.menu.push({nom:nom, titre:def.menu, ordre:(def.ordre!=null?def.ordre:50), bientot:!!def.bientot, prive:!!def.prive}); } };
 APP.naviguer = function(){
   var h = location.hash.replace(/^#\/?/,"") || "accueil";
   var parts = h.split("/"), nom = parts[0], vue = APP.vues[nom] || APP.vues.accueil;
@@ -30722,7 +30724,7 @@ APP.naviguer = function(){
 };
 APP.construireMenu = function(){
   APP.menu.sort(function(a,b){return a.ordre-b.ordre;});
-  document.getElementById("menu").innerHTML = APP.menu.map(function(m){
+  document.getElementById("menu").innerHTML = APP.menu.filter(function(m){ return !m.prive || (APP.accesProf && APP.accesProf()); }).map(function(m){
     return '<li><a href="#/'+m.nom+'" data-vue="'+m.nom+'">'+U.esc(m.titre)+(m.bientot?'<span class="bientot">(bientôt)</span>':'')+'</a></li>';
   }).join("");
 };
@@ -31223,6 +31225,7 @@ APP.enregistrer("calendrier", { menu:"Calendrier", ordre:30, rendu:function(main
   '<li><span class="quand">Fin juin, début juillet</span><h3>Je reçois mon résultat d\'affectation et je m\'inscris</h3><p>Le résultat indique la formation et le lycée. Je dois m\'inscrire dans les délais, sinon je risque de perdre ma place. Sans affectation, je contacte mon collège.</p></li>'+
   '</ol>'+
   '<div class="encart"><p><strong>Les dates précises de l\'année 2026-2027</strong> seront publiées par l\'académie de Normandie au printemps 2027 et ajoutées ici. À titre indicatif, en 2026 : saisie des vœux par les familles du 4 au 26 mai, résultats consultables par les familles le 30 juin, inscription dans le lycée jusqu\'au 4 juillet à midi.</p></div>'+
+  '<p class="pas-imprimer"><a class="btn secondaire" href="#/jpo">Voir les portes ouvertes et les mini-stages</a></p>'+
   APP.blocJpoEleve()+
   '<div class="encart"><p><strong>Bon à savoir.</strong> Les élèves de 3e qui ont construit leur parcours d\'orientation sur la plateforme Avenir(s) de l\'Onisep peuvent bénéficier d\'une bonification pour entrer en 2de professionnelle.</p></div>'+
   '<p class="source">Sources : Onisep, « Après la 3e », rentrée 2026 ; académie de Normandie, guide des procédures d\'affectation, rentrée 2026.</p>';
@@ -32267,7 +32270,7 @@ function vueClasse(main){
   '<section class="bloc neutre pas-imprimer"><h2>Importer des dossiers</h2>'+
    '<p><label class="btn" style="cursor:pointer">Choisir un ou plusieurs fichiers<input type="file" id="pr-import" accept=".json,application/json" multiple class="visuellement-cache"></label></p>'+
    '<p class="source">Vous pouvez sélectionner tous les fichiers d\'un coup. Si un élève renvoie son fichier, la version la plus récente remplace l\'ancienne.</p><div id="pr-msg" role="status"></div></section>'+
-  '<section class="bloc neutre pas-imprimer"><h2>Outils pour la classe</h2><p><a class="btn secondaire" href="#/affelnet">Le barème Affelnet expliqué (campagne 2026)</a> <button class="btn secondaire" type="button" id="pr-seance">Mode séance (projection en classe)</button> <button class="btn secondaire" type="button" id="pr-parents">Mode réunion de parents</button> <a class="btn secondaire" href="#/dixminutes">Dix minutes en vie de classe</a> <a class="btn secondaire" href="#/pression">Taux de pression 2024</a> <a class="btn secondaire" href="#/sources">Sources et mises à jour</a></p></section>'+
+  '<section class="bloc neutre pas-imprimer"><h2>Outils pour la classe</h2><p><a class="btn secondaire" href="#/affelnet">Le barème Affelnet expliqué (campagne 2026)</a> <button class="btn secondaire" type="button" id="pr-seance">Mode séance (projection en classe)</button> <button class="btn secondaire" type="button" id="pr-parents">Mode réunion de parents</button> <a class="btn secondaire" href="#/dixminutes">Dix minutes en vie de classe</a> <a class="btn secondaire" href="#/pression">Taux de pression 2024</a> <a class="btn secondaire" href="#/sources">Sources et mises à jour</a> <button class="btn secondaire" type="button" id="pr-verrou">Verrouiller l\'espace</button></p></section>'+
   APP.blocJpoProf()+
   (liste.length?
   '<section><div class="resultats-tete"><h2 style="margin:0">'+liste.length+' élève'+(liste.length>1?'s':'')+'</h2>'+
@@ -32285,6 +32288,7 @@ function vueClasse(main){
 
   brancherRappel(main);
   U.qs("#pr-seance",main).addEventListener("click", function(){ APP.modeSeance(); });
+  U.qs("#pr-verrou",main).addEventListener("click", function(){ if(window.confirm("Verrouiller l'Espace professeur sur cet appareil ?")) APP.verrouillerProf(); });
   U.qs("#pr-parents",main).addEventListener("click", function(){ APP.modeSeance(APP.DIAPOS_PARENTS); });
   APP.brancherJpoProf(main, function(){ vueClasse(main); });
   U.qs("#pr-import",main).addEventListener("change", function(){
@@ -32356,7 +32360,10 @@ function vueEleve(main, cle){
   U.qs("#pr-e-suppr",main).addEventListener("click", function(){ if(window.confirm("Retirer le dossier de "+nomEleve(d)+" ?")){ C.eleves=C.eleves.filter(function(x){return x!==d;}); APP.store.sauver(); location.hash="#/prof"; } });
 }
 
-APP.enregistrer("prof", { menu:"Espace professeur", ordre:70, rendu:function(main,args){ if(args[0]) vueEleve(main, decodeURIComponent(args[0])); else vueClasse(main); } });
+APP.enregistrer("prof", { menu:"Espace professeur", ordre:70, prive:true, rendu:function(main,args){
+  if(APP.accesProf && !APP.accesProf()){ APP.ecranMotDePasse(main); return; }
+  if(args[0]) vueEleve(main, decodeURIComponent(args[0])); else vueClasse(main);
+} });
 })();
 </script>
 
@@ -33050,11 +33057,12 @@ var APP = window.APP, U = APP.u;
 /* ---------------- Portes ouvertes ---------------- */
 function jpo(){ var e=APP.store.etat; if(!Array.isArray(e.jpo)) e.jpo=[]; return e.jpo; }
 APP.jpo = jpo;
+function jpoModifiables(){ return APP.jpoLocales ? APP.jpoLocales() : jpo(); }
 function dateFr(s){ if(!s) return ""; var p=String(s).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : s; }
 function futur(d){ try { return !d.date || d.date >= new Date().toISOString().slice(0,10); } catch(e){ return true; } }
-APP.jpoTriees = function(){ return jpo().slice().sort(function(a,b){ return String(a.date||"9999").localeCompare(String(b.date||"9999")); }); };
+APP.jpoTriees = function(){ return APP.jpo().slice().sort(function(a,b){ return String(a.date||"9999").localeCompare(String(b.date||"9999")); }); };
 APP.jpoDe = function(e){
-  return jpo().filter(function(d){ return d.etab===e.i || (d.nom && U.sansAccent(d.nom)===U.sansAccent(e.n)); });
+  return APP.jpo().filter(function(d){ return d.etab===e.i || (d.nom && U.sansAccent(d.nom)===U.sansAccent(e.n)); });
 };
 function ligneJpo(d, avecBouton){
   var e = d.etab!=null ? APP.parId[d.etab] : null;
@@ -33073,16 +33081,16 @@ APP.blocJpoEleve = function(){
 APP.brancherJpoEleve = function(main){
   main.addEventListener("click", function(ev){
     var b=ev.target.closest("[data-jpo-carnet]"); if(!b) return;
-    var d=jpo().filter(function(x){return x.id===b.dataset["jpoCarnet"];})[0]; if(!d) return;
+    var d=APP.jpo().filter(function(x){return x.id===b.dataset["jpoCarnet"];})[0]; if(!d) return;
     var e=d.etab!=null?APP.parId[d.etab]:null, C=APP.carnet();
     C.journal.push({id:"j"+Date.now().toString(36), type:"Porte ouverte", date:d.date||"", lieu:(e?e.n+" ("+e.v+")":d.nom||""), sujet:"", appris:"", avis:null});
     APP.store.sauver(); b.textContent="✓ Ajoutée au carnet"; b.disabled=true;
   });
 };
 APP.blocJpoProf = function(){
-  var l = APP.jpoTriees();
+  var l = jpoModifiables().slice().sort(function(a,b){ return String(a.date||"9999").localeCompare(String(b.date||"9999")); });
   return '<section class="bloc neutre"><h2>Portes ouvertes et mini-stages ('+l.length+')</h2>'+
-   '<p class="source">Ces dates s\'affichent dans le calendrier des élèves, sur les fiches d\'établissement, et peuvent être ajoutées à leur carnet. Transmettez-leur le fichier pour qu\'elles apparaissent sur leur appareil.</p>'+
+   '<p class="source">Ces dates apparaissent dans la rubrique <strong>Portes ouvertes</strong>, dans le calendrier et sur les fiches d\'établissement. Sur cet appareil, elles sont visibles immédiatement. <strong>Pour qu\'elles apparaissent pour tout le monde</strong>, créez le fichier ci-dessous et transmettez-le pour qu\'il soit intégré à la prochaine version publiée. '+(APP.JPO_INTEGREES.length?APP.JPO_INTEGREES.length+' date(s) sont déjà intégrées à cette version.':'Aucune date n\'est encore intégrée à cette version.')+'</p>'+
    '<div class="grille deux pas-imprimer">'+
     '<div class="champ"><label for="jp-etab">Établissement</label><input type="text" id="jp-etab" list="jp-liste" placeholder="Commence à taper le nom…"></div>'+
     '<div class="champ"><label for="jp-date">Date</label><input type="date" id="jp-date"></div>'+
@@ -33104,7 +33112,7 @@ APP.brancherJpoProf = function(main, rafraichir){
     APP.store.sauver(); rafraichir();
   });
   U.qs("#jp-export",main).addEventListener("click", function(){
-    APP.telecharger("portes-ouvertes.json", JSON.stringify({type:"carrefour-portes-ouvertes", version:1, cree:new Date().toISOString(), dates:jpo()}, null, 1));
+    APP.telecharger("portes-ouvertes.json", JSON.stringify({type:"carrefour-portes-ouvertes", version:1, cree:new Date().toISOString(), dates:APP.jpoTriees().map(function(d){ var c=Object.assign({},d); delete c.integree; return c; })}, null, 1));
   });
   U.qs("#jp-import",main).addEventListener("change", function(){
     var f=this.files[0]; if(!f) return; var r=new FileReader();
@@ -33121,7 +33129,7 @@ APP.brancherJpoProf = function(main, rafraichir){
   var liste=U.qs("#jp-liste-dates",main);
   if(liste) liste.addEventListener("click", function(ev){
     var b=ev.target.closest("[data-jpo-suppr]"); if(!b) return;
-    APP.store.etat.jpo = jpo().filter(function(x){ return x.id!==b.dataset["jpoSuppr"]; }); APP.store.sauver(); rafraichir();
+    APP.store.etat.jpo = jpoModifiables().filter(function(x){ return x.id!==b.dataset["jpoSuppr"]; }); APP.store.sauver(); rafraichir();
   });
 };
 
@@ -33585,6 +33593,94 @@ APP.enregistrer("sup", { rendu:function(main, args){
     document.title = APP.majuscule(f.l)+" · Carrefour Orientation";
   });
 }});
+})();
+</script>
+
+<script>
+/* ============================================================
+   Module : rubrique « Portes ouvertes » (dates intégrées à la version publiée
+   par le professeur, complétées éventuellement par un fichier importé)
+   et verrouillage de l'Espace professeur
+   ============================================================ */
+(function(){
+"use strict";
+var APP = window.APP, U = APP.u;
+
+/* ---------- Dates intégrées dans cette version ---------- */
+APP.JPO_INTEGREES = APP.lireJSON ? (APP.lireJSON("jpo-integrees") || []) : [];
+var anciennesJpo = APP.jpo;
+APP.jpo = function(){
+  var loc = anciennesJpo(), vues = {};
+  var tout = [];
+  APP.JPO_INTEGREES.forEach(function(d){ if(d && d.id && !vues[d.id]){ vues[d.id]=1; tout.push(Object.assign({integree:true}, d)); } });
+  loc.forEach(function(d){ if(d && d.id && !vues[d.id]){ vues[d.id]=1; tout.push(d); } });
+  return tout;
+};
+APP.jpoLocales = anciennesJpo;
+
+function dateFr(s){ if(!s) return ""; var p=String(s).split("-"); return p.length===3 ? p[2]+"/"+p[1]+"/"+p[0] : s; }
+var MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+function moisDe(d){ var p=String(d.date||"").split("-"); return p.length===3 ? MOIS[parseInt(p[1],10)-1]+" "+p[0] : "Date à préciser"; }
+
+function vueJpo(main){
+  var toutes = APP.jpoTriees(), aujourdhui = new Date().toISOString().slice(0,10);
+  var avenir = toutes.filter(function(d){ return !d.date || d.date>=aujourdhui; });
+  var passees = toutes.filter(function(d){ return d.date && d.date<aujourdhui; });
+  var groupes = [];
+  avenir.forEach(function(d){ var m=moisDe(d); if(!groupes.length || groupes[groupes.length-1].m!==m) groupes.push({m:m, l:[]}); groupes[groupes.length-1].l.push(d); });
+  function carte(d){
+    var e = d.etab!=null ? APP.parId[d.etab] : null;
+    return '<li class="carte-etab"><div><h3>'+(e?'<a href="#/etab/'+e.i+'">'+U.esc(e.n)+'</a>':U.esc(d.nom||"Établissement"))+'</h3>'+
+      '<div class="lieu"><strong>'+U.esc(dateFr(d.date))+'</strong>'+(d.heure?' · '+U.esc(d.heure):'')+(e?' · '+U.esc(e.v)+(e.km!=null?' · '+U.esc(APP.distanceTexte(e)):''):'')+'</div>'+
+      (d.note?'<p class="extrait">'+U.esc(d.note)+'</p>':'')+
+      '<div class="puces pas-imprimer"><button type="button" class="puce" data-jpo-carnet="'+U.esc(d.id)+'">+ Ajouter à mon carnet</button>'+
+      (e&&e.geo?' <a class="puce" href="https://www.openstreetmap.org/?mlat='+e.geo[0]+'&amp;mlon='+e.geo[1]+'#map=15/'+e.geo[0]+'/'+e.geo[1]+'" target="_blank" rel="noopener">Voir le lieu</a>':'')+'</div></div><span></span></li>';
+  }
+  main.innerHTML = '<h1>Portes ouvertes et mini-stages</h1>'+
+  '<p>Les dates communiquées par le collège. Une porte ouverte se visite en famille ; un mini-stage se demande à l\'avance auprès du lycée ou du CFA, souvent par l\'intermédiaire du professeur principal.</p>'+
+  (avenir.length ? groupes.map(function(g){ return '<section class="bloc"><h2>'+U.esc(APP.majuscule(g.m))+'</h2><ul class="liste">'+g.l.map(carte).join("")+'</ul></section>'; }).join("")
+    : '<div class="encart"><p>Aucune date n\'est enregistrée pour l\'instant. Les portes ouvertes ont lieu surtout entre janvier et mars : reviens voir, et surveille les sites des établissements.</p></div>')+
+  (passees.length ? '<details class="plus pas-imprimer"><summary>Dates déjà passées ('+passees.length+')</summary><ul class="liste">'+passees.map(carte).join("")+'</ul></details>' : '')+
+  '<div class="encart"><p><strong>Avant de te déplacer</strong>, vérifie l\'horaire sur le site de l\'établissement : une date peut changer. Note ensuite ce que tu as vu dans <a href="#/parcours">ton carnet de bord</a>, ou remplis un <a href="#/metiers/mes-fiches">compte rendu de mini-stage</a>.</p></div>'+
+  '<p class="pas-imprimer"><button class="btn secondaire" type="button" onclick="window.print()">Imprimer la liste</button></p>'+
+  '<p class="source">Dates saisies par le professeur principal'+(APP.JPO_INTEGREES.length?' et intégrées à cette version de l\'application':'')+'. Elles ne remplacent pas les informations officielles des établissements.</p>';
+  APP.brancherJpoEleve(main);
+}
+APP.enregistrer("jpo", { menu:"Portes ouvertes", ordre:25, rendu:vueJpo });
+
+/* ---------- Verrouillage de l'Espace professeur ---------- */
+var EMPREINTE = 2683360818;   // empreinte du mot de passe (le mot lui-même ne figure pas dans le fichier)
+var SEL = "carrefour-bellême";
+function empreinte(mot){
+  var h = 2166136261;
+  var s = String(mot||"")+SEL;
+  for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return h >>> 0;
+}
+APP.accesProf = function(){ return APP.store.etat.accesProf === true; };
+APP.verrouillerProf = function(){ APP.store.etat.accesProf = false; APP.store.sauver(); APP.construireMenu(); location.hash = "#/accueil"; };
+APP.ecranMotDePasse = function(main){
+  main.innerHTML = '<h1>Espace professeur</h1>'+
+  '<p>Cet espace est réservé au professeur principal : il sert à importer les carnets des élèves et à préparer les conseils de classe. Les élèves et les familles n\'ont pas besoin d\'y entrer.</p>'+
+  '<form id="mdp-form" class="bloc neutre" onsubmit="return false" style="max-width:420px">'+
+   '<div class="champ"><label for="mdp">Mot de passe</label><input type="password" id="mdp" autocomplete="current-password"></div>'+
+   '<p><button class="btn" type="submit" id="mdp-ok">Entrer</button></p>'+
+   '<p id="mdp-msg" role="status" class="source"></p></form>'+
+  '<div class="encart"><p><strong>À savoir :</strong> ce mot de passe éloigne les curieux, mais il ne protège pas un fichier public de façon absolue. Les dossiers d\'élèves importés, eux, ne quittent jamais l\'appareil du professeur.</p></div>'+
+  '<p class="pas-imprimer"><a href="#/accueil">Revenir à l\'accueil</a></p>';
+  function essayer(){
+    var v = U.qs("#mdp",main).value;
+    if(empreinte(v) === EMPREINTE){
+      APP.store.etat.accesProf = true; APP.store.sauver(); APP.construireMenu(); APP.naviguer();
+    } else {
+      U.qs("#mdp-msg",main).textContent = "Mot de passe incorrect.";
+      U.qs("#mdp",main).select();
+    }
+  }
+  U.qs("#mdp-ok",main).addEventListener("click", essayer);
+  U.qs("#mdp-form",main).addEventListener("submit", essayer);
+  U.qs("#mdp",main).focus();
+};
 })();
 </script>
 
