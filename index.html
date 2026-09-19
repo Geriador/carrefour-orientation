@@ -275,6 +275,9 @@ dialog.prise-en-main{max-width:520px}
   .dossier-page h2{font-size:14pt;border-bottom:2px solid #333}
 }
 #pr-zone-print{display:none}
+.lien-filtre{cursor:pointer}
+.lien-texte{background:none;border:0;padding:0;color:var(--bocage);text-decoration:underline;cursor:pointer;font:inherit;text-align:left}
+.lien-texte:hover{text-decoration-thickness:2px}
 /* ---------- Carte et barème ---------- */
 .carte-leaflet{height:520px;border-radius:var(--r-moyen);border:1px solid var(--trait);z-index:1}
 .legende-carte{background:#fff;color:#18221D;padding:.35rem .5rem;border-radius:6px;font-size:.8rem;display:flex;flex-direction:column;gap:.15rem;box-shadow:0 1px 4px rgba(0,0,0,.25)}
@@ -30603,7 +30606,7 @@ E9FDUpW6MmYYkchrh6kwOcORjTGpwnihT+A2kTdkvPs+NcbX5GxNTmXvhOHMJk6xVKibEEeb77Af2UuE
    ============================================================ */
 (function(){
 "use strict";
-var APP = window.APP = { version:"v017", vues:{}, menu:[] };
+var APP = window.APP = { version:"v018", vues:{}, menu:[] };
 
 /* ---------- Stockage local versionné ---------- */
 var CLE = "carrefour-orientation.v1";
@@ -30954,6 +30957,12 @@ APP.carteEtab = function(e, F, extra){
     '<button type="button" class="etoile" data-fav="'+e.i+'" aria-pressed="'+fav+'" aria-label="'+(fav?"Retirer ":"Ajouter ")+U.esc(e.n)+' des favoris">'+(fav?"★":"☆")+'</button>'+
     '<div class="puces">'+puces.join("")+'</div>'+(ex||dbl?'<p class="extrait">'+ex+dbl+'</p>':'')+'</li>';
 };
+APP.chercherFormation = function(intitule, extra){
+  var F = Object.assign({}, DEFAUT, {formation:intitule||"", zone:"voisins"}, extra||{});
+  APP.store.etat.filtres = F; APP.store.sauver();
+  if(location.hash==="#/formations") APP.naviguer(); else location.hash="#/formations";
+};
+APP.chercherTexte = function(q, extra){ APP.chercherFormation("", Object.assign({q:q||""}, extra||{})); };
 APP.basculerFavori = function(id){
   var f = APP.store.etat.favoris, k = f.indexOf(id);
   if(k>=0) f.splice(k,1); else f.push(id);
@@ -31041,6 +31050,7 @@ APP.enregistrer("formations", { menu:"Formations", ordre:10, rendu:function(main
 /* ---------- Fiche établissement ---------- */
 function liste(t, items, cls, cle){
   if(!items || !items.length) return "";
+  if(cle==="fam") return '<h4>'+t+'</h4><ul class="'+(cls||"")+'">'+items.map(function(x){ return '<li><button type="button" class="lien-texte" data-famille="'+U.esc(x)+'">'+U.esc(x)+'</button></li>'; }).join("")+'</ul>';
   return '<h4>'+t+'</h4><ul class="'+(cls||"")+'">'+items.map(function(x){
     var ids = cle && APP.liens ? (APP.liens.dip[cle+"|"+x]||[]) : [];
     if(ids.length===1) return '<li><a href="#/diplome/'+U.esc(ids[0])+'">'+U.esc(x)+'</a></li>';
@@ -31052,7 +31062,7 @@ APP.enregistrer("etab", { rendu:function(main, args){
   var e = APP.parId[parseInt(args[0],10)];
   if(!e){ main.innerHTML = '<h1>Fiche introuvable</h1><p>Cet établissement n\'existe pas dans la base. <a href="#/formations">Revenir à la recherche</a>.</p>'; return; }
   var f = e.f, fav = APP.store.etat.favoris.indexOf(e.i)>=0;
-  var pro = liste("CAP",f.cap,"","cap")+liste("CAP agricole",f.capa,"","capa")+liste("2de professionnelle (familles de métiers)",f.fam)+liste("Bac professionnel",f.bp,"","bp")+liste("BNMA et métiers d'art",f.bnma,"","bnma");
+  var pro = liste("CAP",f.cap,"","cap")+liste("CAP agricole",f.capa,"","capa")+liste("2de professionnelle (familles de métiers)",f.fam,"","fam")+liste("Bac professionnel",f.bp,"","bp")+liste("BNMA et métiers d'art",f.bnma,"","bnma");
   var gt = liste("Diplômes préparés",f.bac)+liste("2de spécifique",f.sp2)+liste("Spécialités de bac général repérées",f.spe)+liste("Enseignements optionnels en 2de",f.opt);
   var autres = liste("Langues vivantes",f.lv)+liste("Sections particulières et dispositifs",f.sect)+liste("Remarques du guide",[].concat(f.rq||[], e.x||[]));
   var app = (f.app||[]).slice().sort(function(a,b){ return a[1].localeCompare(b[1],"fr") || a[0].localeCompare(b[0],"fr") || a[3]-b[3]; });
@@ -31105,6 +31115,11 @@ APP.enregistrer("etab", { rendu:function(main, args){
     var on = APP.basculerFavori(e.i); this.setAttribute("aria-pressed", String(on)); this.textContent = on ? "★ Dans mes favoris" : "☆ Ajouter aux favoris";
   });
   APP.brancherComparer(main);
+  main.addEventListener("click", function(ev){
+    var b=ev.target.closest("[data-famille],[data-serie]"); if(!b) return;
+    if(b.dataset.famille) APP.chercherFormation(b.dataset.famille);
+    else location.hash="#/voies/horaires/t1";
+  });
   document.title = e.n + " · Carrefour Orientation";
 }});
 })();
@@ -31160,24 +31175,30 @@ APP.enregistrer("voies", { menu:"Voies et diplômes", ordre:20, rendu:function(m
   '<p>On y apprend un métier, soit comme élève dans un lycée professionnel, soit comme apprenti dans un CFA ou un lycée. Les cours mêlent enseignements généraux et enseignements professionnels, avec des périodes de formation en milieu professionnel (PFMP), pour lesquelles l\'État verse une allocation de stage.</p>'+
   '<div class="grille trois">'+
   '<section class="voie pro"><h3>Le CAP</h3><p>Premier niveau de qualification pour exercer un métier précis. Près de 200 spécialités existent.</p><dl><dt>Durée</dt><dd>2 ans en général (1 an ou 3 ans selon le profil)</dd><dt>Stages</dt><dd>12 à 14 semaines de PFMP</dd><dt>Niveau</dt><dd>3</dd></dl>'+
-  '<details class="plus"><summary>Et après ?</summary><p>Vie active, ou poursuite : bac pro dans une spécialité proche, BP, CS, BTM, un autre CAP en 1 an, ou 2e année de BNMA après un CAP des métiers d\'art.</p></details></section>'+
+  '<details class="plus"><summary>Et après ?</summary><p>Vie active, ou poursuite : bac pro dans une spécialité proche, BP, CS, BTM, un autre CAP en 1 an, ou 2e année de BNMA après un CAP des métiers d\'art.</p></details><p class="pas-imprimer"><a href="#/voies/horaires/cap1">Voir les horaires du CAP</a> · <button type="button" class="lien-texte" data-cherche="cap">Où préparer un CAP ?</button></p></section>'+
   '<section class="voie pro"><h3>Le bac professionnel</h3><p>Près de 100 spécialités. En fin de 3e, on choisit une spécialité ou une 2de pro par famille de métiers (la spécialité se choisit alors en fin de 2de). En apprentissage, on choisit directement la spécialité.</p><dl><dt>Durée</dt><dd>3 ans (2de, 1re, terminale pro)</dd><dt>Stages</dt><dd>20 semaines de PFMP</dd><dt>Niveau</dt><dd>4</dd></dl>'+
-  '<details class="plus"><summary>Et après ?</summary><p>Vie active ou poursuite d\'études, notamment en BTS. En terminale, un parcours personnalisé prépare soit l\'insertion professionnelle, soit la poursuite d\'études.</p></details></section>'+
+  '<details class="plus"><summary>Et après ?</summary><p>Vie active ou poursuite d\'études, notamment en BTS. En terminale, un parcours personnalisé prépare soit l\'insertion professionnelle, soit la poursuite d\'études.</p></details><p class="pas-imprimer"><a href="#/voies/horaires/bp2">Voir les horaires du bac pro</a> · <button type="button" class="lien-texte" data-cherche="bp">Où préparer un bac pro ?</button></p></section>'+
   '<section class="voie pro"><h3>Le BNMA</h3><p>Brevet national des métiers d\'art, nouveau diplôme créé à la rentrée 2026. Il remplace progressivement les BMA et les bacs pro artisanat et métiers d\'art.</p><dl><dt>Durée</dt><dd>3 ans, en groupes de 15 élèves</dd><dt>Stages</dt><dd>16 semaines de PFMP</dd><dt>Niveau</dt><dd>4</dd></dl>'+
-  '<details class="plus"><summary>Et après ?</summary><p>Principalement le DN MADE (diplôme national des métiers d\'art et du design) ou d\'autres formations supérieures.</p></details></section>'+
+  '<details class="plus"><summary>Et après ?</summary><p>Principalement le DN MADE (diplôme national des métiers d\'art et du design) ou d\'autres formations supérieures.</p></details><p class="pas-imprimer"><a href="#/voies/horaires/bn1">Voir les horaires du BNMA</a></p></section>'+
   '</div>'+
   '<div class="encart"><p><strong>L\'apprentissage, qu\'est-ce que c\'est ?</strong> C\'est un statut, pas une voie à part : on prépare un CAP, un BNMA ou un bac pro en alternant CFA ou lycée et entreprise, avec un contrat de travail et un salaire. Il faut avoir au moins 16 ans, ou 15 ans et 1 jour en ayant terminé la 3e. Le contrat doit être signé entre 3 mois avant et 3 mois après le début de la formation : il faut donc chercher un employeur tôt. Si le contrat s\'arrête, on peut poursuivre sa formation comme élève au lycée.</p></div>'+
   '<h2>La voie générale et technologique</h2>'+
   '<p>Elle prépare en 3 ans au bac général ou au bac technologique, qui mènent surtout à des études supérieures. Tout commence par une 2de commune.</p>'+
   '<div class="grille trois">'+
-  '<section class="voie gt"><h3>La 2de générale et technologique</h3><p>Des enseignements communs (français, histoire-géographie, langues, maths, sciences, SES, SNT…), des tests de positionnement en début d\'année, de l\'accompagnement à l\'orientation et une séquence d\'observation en milieu professionnel de 2 semaines.</p><p>On peut ajouter un enseignement optionnel général et un technologique.</p></section>'+
-  '<section class="voie gt"><h3>Le bac général</h3><p>En 1re et en terminale, des enseignements communs et des enseignements de spécialité : 3 en 1re, puis 2 gardés en terminale, à choisir parmi 13 disciplines.</p><p>Il mène surtout à des études longues (bac+3, bac+5 et plus).</p></section>'+
-  '<section class="voie gt"><h3>Le bac technologique</h3><p>Huit séries : S2TMD, ST2S, STAV, STD2A, STHR, STI2D, STL, STMG.</p><p>Il mène surtout à des études supérieures techniques (BTS, BUT, écoles…). La série STHR a sa propre 2de.</p></section>'+
+  '<section class="voie gt"><h3>La 2de générale et technologique</h3><p>Des enseignements communs (français, histoire-géographie, langues, maths, sciences, SES, SNT…), des tests de positionnement en début d\'année, de l\'accompagnement à l\'orientation et une séquence d\'observation en milieu professionnel de 2 semaines.</p><p>On peut ajouter un enseignement optionnel général et un technologique.</p><p class="pas-imprimer"><a href="#/voies/horaires/gt2">Voir les horaires de 2de GT</a> · <button type="button" class="lien-texte" data-cherche="gt">Où préparer une 2de GT ?</button></p></section>'+
+  '<section class="voie gt"><h3>Le bac général</h3><p>En 1re et en terminale, des enseignements communs et des enseignements de spécialité : 3 en 1re, puis 2 gardés en terminale, à choisir parmi 13 disciplines.</p><p>Il mène surtout à des études longues (bac+3, bac+5 et plus).</p><p class="pas-imprimer"><a href="#/voies/horaires/g1">Voir les horaires de 1re générale</a> · <a href="#/voies/specialites">Choisir ses spécialités</a></p></section>'+
+  '<section class="voie gt"><h3>Le bac technologique</h3><p>Huit séries : S2TMD, ST2S, STAV, STD2A, STHR, STI2D, STL, STMG.</p><p>Il mène surtout à des études supérieures techniques (BTS, BUT, écoles…). La série STHR a sa propre 2de.</p><p class="pas-imprimer"><a href="#/voies/horaires/t1">Voir les horaires de 1re technologique</a></p></section>'+
   '</div>'+
   '<h2>D\'autres possibilités</h2>'+
   '<p>Entre 16 et 18 ans, quelques formations particulières existent, notamment dans les armées (écoles militaires préparatoires, école des mousses) et dans l\'animation (CPJEPS, BPJEPS). Elles ont chacune leurs conditions d\'accès : renseigne-toi auprès du psychologue de l\'Éducation nationale.</p>'+
   '<p class="source">Source : Onisep, « Après la 3e, choisir son orientation », rentrée 2026. Contenus reformulés pour les élèves.</p>';
   APP.brancherSchema(main);
+  main.addEventListener("click", function(ev){
+    var b=ev.target.closest("[data-cherche]"); if(!b) return;
+    var c=b.dataset.cherche;
+    if(c==="gt") APP.chercherFormation("2de générale et technologique");
+    else APP.chercherFormation("", {type:c});
+  });
 }});
 })();
 </script>
@@ -31671,17 +31692,21 @@ APP.enregistrer("metier", { rendu:function(main, args){
     '<a class="retour pas-imprimer" href="#/metiers">← Explorer les métiers</a>'+
     '<article><div class="fiche-tete"><div><h1>'+U.esc(m.titre)+'</h1>'+
     ((m.syn||[]).length?'<p class="source">Autres noms : '+U.esc(m.syn.join(", "))+'</p>':'')+
-    '<div class="puces"><span class="puce">Niveau minimal : '+U.esc(m.niv||"non précisé")+'</span>'+(m.dom||[]).map(function(d){return '<span class="puce">'+U.esc(d)+'</span>';}).join("")+'</div></div>'+
+    '<div class="puces"><span class="puce">Niveau minimal : '+U.esc(m.niv||"non précisé")+'</span>'+(m.dom||[]).map(function(d){return '<button type="button" class="puce lien-filtre" data-dom="'+U.esc(d)+'" title="Voir les métiers de ce domaine">'+U.esc(d)+'</button>';}).join("")+'</div></div>'+
     '<div class="pas-imprimer"><button class="btn" type="button" id="mt-fiche">Créer ma fiche sur ce métier</button> '+
     '<a class="btn secondaire" href="https://www.onisep.fr/http/redirection/metier/slug/'+U.esc(m.id)+'" target="_blank" rel="noopener">Fiche et vidéos sur onisep.fr</a></div></div>'+
     '<div class="contenu-onisep chapo-metier">'+m.acc+'</div>'+
     '<section class="bloc"><h2>Les diplômes après la 3e qui y mènent</h2>'+diplomes+'</section>'+
     section("En bref", m.fc)+section("Le travail au quotidien", m.nt)+section("Les compétences", m.co)+section("Les conditions de travail", m.ct)+section("Salaire et vie professionnelle", m.vp)+section("Accès au métier", m.am)+
-    ((m.ci||[]).length?'<section class="bloc neutre"><h2>Pour qui aime…</h2><div class="puces">'+m.ci.map(function(c){return '<span class="puce">'+U.esc(APP.majuscule(c))+'</span>';}).join(" ")+'</div></section>':'')+
+    ((m.ci||[]).length?'<section class="bloc neutre"><h2>Pour qui aime…</h2><p class="source">Clique sur un centre d\'intérêt pour voir les autres métiers concernés.</p><div class="puces">'+m.ci.map(function(c){return '<button type="button" class="puce lien-filtre" data-ci="'+U.esc(c)+'">'+U.esc(APP.majuscule(c))+'</button>';}).join(" ")+'</div></section>':'')+
     (ass?'<section class="bloc neutre"><h2>Métiers proches</h2><ul>'+ass+'</ul></section>':'')+
     (src?'<section class="bloc neutre"><h2>Pour aller plus loin</h2><ul>'+src+'</ul></section>':'')+
     '<p class="source">'+APP.ONISEP_CREDIT+' Les salaires indiqués sont des repères pour les débutants, qui varient selon l\'employeur et la région.</p></article>';
     U.qs("#mt-fiche",main).addEventListener("click", function(){ APP.creerFiche(m.titre); });
+    main.addEventListener("click", function(ev){
+      var b=ev.target.closest("[data-ci],[data-dom]"); if(!b) return;
+      APP.explorerMetiersAvec(b.dataset.ci ? {ci:b.dataset.ci} : {dom:b.dataset.dom});
+    });
     document.title = m.titre+" · Carrefour Orientation";
   });
 }});
@@ -31713,7 +31738,7 @@ APP.enregistrer("diplome", { rendu:function(main, args){
       var par={};
       pe.forEach(function(x){ var t=x.t||"Autres"; (par[t]=par[t]||[]).push(x); });
       return '<section class="bloc gt"><h2>Et après ce diplôme ?</h2><p>Formations du supérieur citées par l\'Onisep comme poursuites possibles, sous conditions (résultats, avis du conseil de classe, places disponibles).</p>'+
-        Object.keys(par).sort().map(function(t){ return '<h3>'+U.esc(t||"Autres")+'</h3><ul>'+par[t].slice(0,12).map(function(x){ return '<li>'+U.esc(APP.majuscule(x.l))+(x.du?' <span class="puce">'+U.esc(x.du)+'</span>':'')+'</li>'; }).join("")+(par[t].length>12?'<li class="source">et '+(par[t].length-12)+' autres</li>':'')+'</ul>'; }).join("")+
+        Object.keys(par).sort().map(function(t){ return '<h3>'+U.esc(t||"Autres")+'</h3><ul>'+par[t].map(function(x){ return '<li><a href="#/sup/'+U.esc(x.id)+'">'+U.esc(APP.majuscule(x.l))+'</a>'+(x.du?' <span class="puce">'+U.esc(x.du)+'</span>':'')+'</li>'; }).join("")+'</ul>'; }).join("")+
         '</section>';
     })()+
     (mets.length?'<section class="bloc neutre"><h2>Métiers accessibles</h2><ul>'+mets.map(function(m){return '<li><a href="#/metier/'+U.esc(m.id)+'">'+U.esc(m.titre)+'</a></li>';}).join("")+'</ul></section>':'')+
@@ -33170,9 +33195,11 @@ function vueRecherche(main, args){
     location.replace("#/recherche/"+encodeURIComponent(APP._q));
     var loc = resultatsLocaux(APP._q);
     zone.innerHTML =
-      bloc("Établissements", loc.etabs.length ? '<ul class="liste">'+loc.etabs.slice(0,8).map(function(e){ return APP.carteEtab(e); }).join("")+'</ul>'+(loc.etabs.length>8?'<p><a href="#/formations">Voir tous les établissements dans la recherche détaillée</a></p>':'') : "", loc.etabs.length)+
+      bloc("Établissements", loc.etabs.length ? '<ul class="liste">'+loc.etabs.slice(0,8).map(function(e){ return APP.carteEtab(e); }).join("")+'</ul>'+(loc.etabs.length>8?'<p><button type="button" class="btn secondaire" id="rg-tous-etabs">Voir les '+loc.etabs.length+' établissements dans la recherche détaillée</button></p>':'') : "", loc.etabs.length)+
+      bloc("Établissements", "", null).replace(/[\s\S]*/, "")+
       bloc("Glossaire", loc.glossaire.length ? '<dl class="glossaire">'+loc.glossaire.slice(0,8).map(function(g){ return '<div><dt>'+U.esc(g[0])+'</dt><dd>'+U.esc(g[1])+'</dd></div>'; }).join("")+'</dl>' : "", loc.glossaire.length)+
       '<p id="rg-onisep" class="source">Recherche des métiers et des diplômes…</p>';
+    var bTous=U.qs("#rg-tous-etabs",zone); if(bTous) bTous.addEventListener("click", function(){ APP.chercherTexte(APP._q, {zone:"trois"}); });
     var mots = U.sansAccent(APP._q).split(/\s+/).filter(Boolean);
     APP.onisep().then(function(O){
       if(!document.body.contains(zone) || APP._q!==champ.value.trim()) return;
@@ -33528,6 +33555,36 @@ APP.priseEnMain = function(force){
   document.body.appendChild(dlg); rendre();
   if(dlg.showModal) dlg.showModal(); else dlg.setAttribute("open","");
 };
+})();
+</script>
+
+<script>
+/* ============================================================
+   Module : fiche d'une formation du supérieur (poursuite d'études)
+   ============================================================ */
+(function(){
+"use strict";
+var APP = window.APP, U = APP.u;
+APP.enregistrer("sup", { rendu:function(main, args){
+  APP.chargement(main, function(){
+    var f = (APP.O.sup||{})[args[0]];
+    if(!f){ main.innerHTML = '<h1>Formation introuvable</h1><p><a href="#/formations">Revenir aux formations</a>.</p>'; return; }
+    // diplômes après la 3e qui mènent à cette formation
+    var avant = Object.keys(APP.O.forms).map(function(id){ return APP.O.forms[id]; })
+      .filter(function(x){ return (x.pe_ids||[]).indexOf(f.id)>=0; });
+    main.innerHTML =
+    '<a class="retour pas-imprimer" href="javascript:history.back()">← Retour</a>'+
+    '<article><div class="fiche-tete"><div><h1>'+U.esc(APP.majuscule(f.l))+'</h1>'+
+    '<div class="puces">'+(f.t?'<span class="puce gt">'+U.esc(f.t)+'</span>':'')+(f.du?'<span class="puce">Durée : '+U.esc(f.du)+'</span>':'')+(f.nv?'<span class="puce">'+U.esc(APP.majuscule(f.nv))+'</span>':'')+'</div></div>'+
+    '<div class="pas-imprimer"><a class="btn secondaire" href="https://www.onisep.fr/http/redirection/formation/slug/'+U.esc(f.id)+'" target="_blank" rel="noopener">Fiche complète sur onisep.fr</a></div></div>'+
+    '<div class="encart"><p><strong>Cette formation vient après un premier diplôme</strong> (CAP, bac professionnel, baccalauréat…), selon son niveau. Elle figure ici comme poursuite possible : c\'est un aperçu de la suite, pas une étape à choisir dès la 3e.</p></div>'+
+    (f.der?'<div class="encart alerte"><p>Diplôme en voie de disparition : dernière session prévue en '+U.esc(f.der)+'.</p></div>':'')+
+    (f.fc?'<section class="bloc gt contenu-onisep"><h2>Présentation</h2>'+f.fc+'</section>':'')+
+    (avant.length?'<section class="bloc"><h2>Diplômes après la 3e qui y mènent</h2><ul>'+avant.map(function(x){ return '<li><a href="#/diplome/'+U.esc(x.id)+'">'+U.esc(APP.majuscule(x.l))+'</a> <span class="puce pro">'+U.esc(x.t)+'</span></li>'; }).join("")+'</ul></section>':'')+
+    '<p class="source">'+APP.ONISEP_CREDIT+' Les établissements qui préparent cette formation ne figurent pas dans l\'application, qui recense les formations accessibles après la 3e.</p></article>';
+    document.title = APP.majuscule(f.l)+" · Carrefour Orientation";
+  });
+}});
 })();
 </script>
 
