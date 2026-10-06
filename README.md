@@ -31,3 +31,4 @@ Les informations décrivent la rentrée 2026 et doivent être vérifiées auprè
 Chaque année, remplacer `index.html` par la nouvelle version. La liste des mises à jour à prévoir figure dans l'Espace professeur de l'application.
 
 Bonne découverte !
+Mise en ligne 
