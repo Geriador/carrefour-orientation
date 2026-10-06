@@ -298,6 +298,15 @@ dialog.prise-en-main{max-width:520px}
 .ligne-jour .puce{cursor:pointer}
 .jours-saisie legend{font-weight:600}
 ul.jours-jpo{margin:.3rem 0 0;padding-left:1.1rem;font-size:.92rem}
+.encart-jpo{display:flex;align-items:center;gap:.8rem;margin:0 0 1.2rem;padding:.8rem 1rem;border-radius:var(--r-moyen);text-decoration:none;color:var(--encre);
+  background:linear-gradient(90deg,var(--gt-clair),var(--papier));border:2px solid var(--signal);box-shadow:0 0 0 rgba(244,194,13,.6);animation:halo 2.4s ease-in-out infinite}
+.encart-jpo:hover,.encart-jpo:focus{border-color:var(--bocage);animation:none;box-shadow:0 0 0 3px var(--gt-clair)}
+.encart-jpo .detail{display:block;font-size:.9rem;color:var(--gris);margin-top:.15rem}
+.encart-jpo .fleche{margin-left:auto;font-size:1.3rem;color:var(--bocage)}
+.pastille-jpo{width:14px;height:14px;border-radius:50%;background:var(--signal);flex:0 0 auto;animation:battement 1.6s ease-in-out infinite}
+@keyframes halo{0%,100%{box-shadow:0 0 0 0 rgba(244,194,13,.55)}50%{box-shadow:0 0 14px 4px rgba(244,194,13,.55)}}
+@keyframes battement{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.65}}
+@media (prefers-reduced-motion: reduce){ .encart-jpo,.pastille-jpo{animation:none} }
 /* ---------- Carte et barème ---------- */
 .carte-leaflet{height:520px;border-radius:var(--r-moyen);border:1px solid var(--trait);z-index:1}
 .legende-carte{background:#fff;color:#18221D;padding:.35rem .5rem;border-radius:6px;font-size:.8rem;display:flex;flex-direction:column;gap:.15rem;box-shadow:0 1px 4px rgba(0,0,0,.25)}
@@ -436,6 +445,11 @@ div.entree.a-venir{cursor:default}
       <label><input type="radio" name="role" value="eleve-3e" checked> Élève de 3e</label>
       <label><input type="radio" name="role" value="famille"> Parent ou famille</label>
       <label><input type="radio" name="role" value="prof"> Professeur ou personnel du collège</label>
+    </div>
+    <div class="champ" id="zone-mdp-profil" hidden>
+      <label for="mdp-profil">Mot de passe réservé aux personnels</label>
+      <input type="password" id="mdp-profil" autocomplete="current-password">
+      <p class="source" id="mdp-profil-msg">L'espace professeur contient des dossiers d'élèves : il est protégé.</p>
     </div>
     <div class="dlg-pied"><button class="btn" value="ok">Continuer</button></div>
   </form>
@@ -30631,7 +30645,7 @@ E9FDUpW6MmYYkchrh6kwOcORjTGpwnihT+A2kTdkvPs+NcbX5GxNTmXvhOHMJk6xVKibEEeb77Af2UuE
    ============================================================ */
 (function(){
 "use strict";
-var APP = window.APP = { version:"v024", vues:{}, menu:[] };
+var APP = window.APP = { version:"v025", vues:{}, menu:[] };
 
 /* ---------- Stockage local versionné ---------- */
 var CLE = "carrefour-orientation.v1";
@@ -30775,8 +30789,32 @@ APP.demarrer = function(){
   APP.construireMenu();
 
   var dlgP = document.getElementById("dlg-profil");
-  document.getElementById("form-profil").addEventListener("submit", function(){
+  var zoneMdp = document.getElementById("zone-mdp-profil");
+  U.qsa('input[name="role"]', dlgP).forEach(function(r){
+    r.addEventListener("change", function(){
+      var prof = r.value==="prof" && !(APP.accesProf && APP.accesProf());
+      zoneMdp.hidden = !prof;
+      if(prof) document.getElementById("mdp-profil").focus();
+    });
+  });
+  document.getElementById("form-profil").addEventListener("submit", function(ev){
     var v = (U.qs('input[name="role"]:checked', dlgP)||{}).value || "eleve-3e";
+    if(v==="prof" && APP.accesProf && !APP.accesProf()){
+      var saisi = document.getElementById("mdp-profil").value;
+      if(!APP.motDePasseValide || !APP.motDePasseValide(saisi)){
+        ev.preventDefault();
+        zoneMdp.hidden = false;
+        document.getElementById("mdp-profil-msg").textContent = saisi
+          ? "Mot de passe incorrect. Si vous êtes élève ou parent, choisissez un autre profil."
+          : "Indiquez le mot de passe communiqué par le professeur principal, ou choisissez un autre profil.";
+        document.getElementById("mdp-profil").select();
+        return;
+      }
+      APP.store.etat.accesProf = true;
+      document.getElementById("mdp-profil").value = "";
+      zoneMdp.hidden = true;
+      APP.construireMenu();
+    }
     APP.store.etat.profil = v; APP.store.sauver(); APP.naviguer();
     if(APP.priseEnMain) setTimeout(function(){ APP.priseEnMain(); }, 200);
   });
@@ -30813,6 +30851,8 @@ APP.demarrer = function(){
 APP.ouvrirProfil = function(){
   var dlg = document.getElementById("dlg-profil"), p = APP.store.etat.profil;
   if(p){ var r = U.qs('input[value="'+p+'"]', dlg); if(r) r.checked = true; }
+  var z = document.getElementById("zone-mdp-profil");
+  if(z) z.hidden = !(p==="prof" && APP.accesProf && !APP.accesProf());
   if(typeof dlg.showModal === "function") dlg.showModal();
 };
 })();
@@ -30832,6 +30872,17 @@ var ENTREES = {
   "famille": [["familles","Accompagner son enfant","Le rôle de la famille, les démarches, les aides."],["calendrier","Le calendrier de l'orientation","Ce qui se passe et quand."],["formations","Les formations proches","Lycées et CFA autour de Bellême et au-delà."],["voies","Les voies après la 3e","Une présentation claire de chaque parcours."],["glossaire","Glossaire","Pour décoder les sigles."]],
   "prof": [["prof","Espace professeur","Import des dossiers élèves et synthèse pour le conseil de classe."],["formations","Base des formations","751 établissements, filtres et sources."],["calendrier","Calendrier","Les étapes et les dates indicatives."],["voies","Voies et diplômes","Contenus de référence pour les séances."],["glossaire","Glossaire","Les sigles."]]
 };
+function encartJpo(){
+  if(!APP.jpoTriees) return "";
+  var aujourdhui = new Date().toISOString().slice(0,10);
+  var l = APP.jpoTriees().filter(function(d){ return !d.date || d.date >= aujourdhui; });
+  if(!l.length) return "";
+  var p = l[0], e = p.etab!=null ? APP.parId[p.etab] : null;
+  return '<a class="encart-jpo" href="#/jpo"><span class="pastille-jpo" aria-hidden="true"></span>'+
+    '<span><strong>'+(l.length>1 ? l.length+' dates de portes ouvertes et de mini-stages' : 'Une date de portes ouvertes')+' à venir</strong>'+
+    '<span class="detail">Prochaine : '+U.esc(APP.jpoTexteDate(p, true).split(" ; ")[0])+(e?' · '+U.esc(e.n)+' ('+U.esc(e.v)+')':'')+'</span></span>'+
+    '<span class="fleche" aria-hidden="true">→</span></a>';
+}
 function panneau(){
   return '<svg class="panneau" viewBox="0 0 400 360" role="group" aria-labelledby="panneau-t">'+
   '<title id="panneau-t">Panneau indicateur : après la 3e, deux grandes voies</title>'+
@@ -30855,6 +30906,7 @@ APP.enregistrer("accueil", { menu:"Accueil", ordre:0, rendu:function(main){
     '<p><a class="btn signal" href="#/'+(p==="famille"?"familles":(p==="prof"||p==="eleve-3e"?"formations":"voies"))+'">'+(p==="eleve-3e"||p==="prof"?"Chercher une formation":(p==="famille"?"Commencer ici":"Découvrir les voies"))+'</a> '+
     '<button class="btn secondaire" type="button" id="changer-p">Je suis '+U.esc(APP.profilLibelle())+' · changer</button></p></div>'+
     '<div aria-hidden="false">'+panneau()+'</div></section>'+
+    encartJpo()+
     '<h2>Par où commencer ?</h2><div class="entrees">'+
     ENTREES[p].map(function(x){ return '<a class="entree'+(x[3]?' a-venir':'')+'" href="#/'+x[0]+'"><strong>'+U.esc(x[1])+(x[3]?' <span class="puce">bientôt</span>':'')+'</strong><span>'+U.esc(x[2])+'</span></a>'; }).join("")+
     '</div>'+
@@ -33788,6 +33840,7 @@ function empreinte(mot){
   for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
   return h >>> 0;
 }
+APP.motDePasseValide = function(mot){ return empreinte(mot) === EMPREINTE; };
 APP.accesProf = function(){ return APP.store.etat.accesProf === true; };
 APP.verrouillerProf = function(){ APP.store.etat.accesProf = false; APP.store.sauver(); APP.construireMenu(); location.hash = "#/accueil"; };
 APP.ecranMotDePasse = function(main){
@@ -34085,7 +34138,7 @@ function lire(){
     if(!propres.length && !APP.JPO_INTEGREES.length) return;
     APP.JPO_INTEGREES = propres;
     APP.JPO_EN_LIGNE = {date:d.cree || null, nb:propres.length};
-    if(/^#\/(jpo|calendrier|etab|prof)/.test(location.hash)) APP.naviguer();
+    if(!location.hash || /^#\/(accueil|jpo|calendrier|etab|prof)/.test(location.hash)) APP.naviguer();
   }).catch(function(){ /* fichier absent : on garde les dates intégrées */ });
 };
 
