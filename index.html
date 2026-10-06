@@ -292,6 +292,12 @@ dialog.prise-en-main{max-width:520px}
 .devenir li{position:relative;padding:.45rem .6rem;margin:.3rem 0;border:1px solid var(--trait);border-radius:var(--r-petit);overflow:hidden;z-index:0}
 .devenir .part{position:absolute;left:0;top:0;bottom:0;z-index:-1;opacity:.35}
 .devenir .etudes{background:#6C8EBF}.devenir .emploi{background:var(--pro)}.devenir .autre{background:#8A8F98}
+.ligne-jour{display:flex;flex-wrap:wrap;align-items:center;gap:.4rem;margin:.3rem 0}
+.ligne-jour .num{min-width:4.5rem;font-weight:600;font-size:.9rem}
+.ligne-jour input{padding:.45rem;border:1px solid var(--trait);border-radius:var(--r-petit);background:var(--papier);min-height:40px}
+.ligne-jour .puce{cursor:pointer}
+.jours-saisie legend{font-weight:600}
+ul.jours-jpo{margin:.3rem 0 0;padding-left:1.1rem;font-size:.92rem}
 /* ---------- Carte et barème ---------- */
 .carte-leaflet{height:520px;border-radius:var(--r-moyen);border:1px solid var(--trait);z-index:1}
 .legende-carte{background:#fff;color:#18221D;padding:.35rem .5rem;border-radius:6px;font-size:.8rem;display:flex;flex-direction:column;gap:.15rem;box-shadow:0 1px 4px rgba(0,0,0,.25)}
@@ -30625,7 +30631,7 @@ E9FDUpW6MmYYkchrh6kwOcORjTGpwnihT+A2kTdkvPs+NcbX5GxNTmXvhOHMJk6xVKibEEeb77Af2UuE
    ============================================================ */
 (function(){
 "use strict";
-var APP = window.APP = { version:"v023", vues:{}, menu:[] };
+var APP = window.APP = { version:"v024", vues:{}, menu:[] };
 
 /* ---------- Stockage local versionné ---------- */
 var CLE = "carrefour-orientation.v1";
@@ -33117,34 +33123,64 @@ APP.brancherJpoEleve = function(main){
     APP.store.sauver(); b.textContent="✓ Ajoutée au carnet"; b.disabled=true;
   });
 };
+var TYPES_JPO = ["Portes ouvertes","Mini-stages sur inscription","Journée d'immersion","Portes ouvertes et mini-stages","Salon ou forum des formations","Réunion d'information","Autre (à préciser)"];
 APP.blocJpoProf = function(){
   var l = jpoModifiables().slice().sort(function(a,b){ return String(a.date||"9999").localeCompare(String(b.date||"9999")); });
   return '<section class="bloc neutre"><h2>Portes ouvertes et mini-stages ('+l.length+')</h2>'+
    '<p class="source">Ces dates apparaissent dans la rubrique <strong>Portes ouvertes</strong>, dans le calendrier et sur les fiches d\'établissement. Sur cet appareil, elles sont visibles immédiatement ; pour tous les visiteurs, utilisez la publication juste en dessous.</p>'+
    '<div class="grille deux pas-imprimer">'+
     '<div class="champ"><label for="jp-etab">Établissement</label><input type="text" id="jp-etab" list="jp-liste" placeholder="Commence à taper le nom…"></div>'+
-    '<div class="champ"><label for="jp-date">Date de début</label><input type="date" id="jp-date"></div>'+
-    '<div class="champ"><label for="jp-h1">Heure de début</label><input type="time" id="jp-h1"></div>'+
-    '<div class="champ"><label for="jp-fin">Date de fin <span class="source">(si l\'événement dure plusieurs jours)</span></label><input type="date" id="jp-fin"></div>'+
-    '<div class="champ"><label for="jp-h2">Heure de fin</label><input type="time" id="jp-h2"></div>'+
-    '<div class="champ"><label for="jp-note">Précision (facultatif)</label><input type="text" id="jp-note" placeholder="ex. mini-stages sur inscription"></div>'+
-   '</div><datalist id="jp-liste">'+APP.etabs.filter(function(e){return e.km!=null && e.km<=120;}).sort(function(a,b){return a.km-b.km;}).map(function(e){ return '<option value="'+U.esc(e.n+" ("+e.v+")")+'">'; }).join("")+'</datalist>'+
+    '<div class="champ"><label for="jp-type">Type d\'événement</label><select id="jp-type">'+TYPES_JPO.map(function(t){ return '<option value="'+U.esc(t)+'">'+U.esc(t)+'</option>'; }).join("")+'</select></div>'+
+    '<div class="champ" id="jp-libre-zone" hidden><label for="jp-libre">Préciser</label><input type="text" id="jp-libre" placeholder="ex. journée d\'immersion sur inscription"></div>'+
+   '</div>'+
+   '<fieldset class="champ jours-saisie"><legend>Journées <span class="source">(une ligne par journée : elles peuvent se suivre ou non)</span></legend><div id="jp-jours"></div>'+
+   '<p><button class="btn secondaire" type="button" id="jp-plus-jour">+ Ajouter une journée</button></p></fieldset><datalist id="jp-liste">'+APP.etabs.filter(function(e){return e.km!=null && e.km<=120;}).sort(function(a,b){return a.km-b.km;}).map(function(e){ return '<option value="'+U.esc(e.n+" ("+e.v+")")+'">'; }).join("")+'</datalist>'+
    '<p class="pas-imprimer"><button class="btn" type="button" id="jp-ajouter">Ajouter la date</button> <button class="btn secondaire" type="button" id="jp-export">Créer le fichier pour les élèves</button> <label class="btn secondaire" style="cursor:pointer">Ouvrir un fichier<input type="file" id="jp-import" accept=".json,application/json" class="visuellement-cache"></label> <span id="jp-msg" role="status" class="source"></span></p>'+
    (l.length?'<ul class="liste" id="jp-liste-dates">'+l.map(function(d){ return ligneJpo(d,true); }).join("")+'</ul>':'<p>Aucune date enregistrée.</p>')+'</section>';
 };
 APP.brancherJpoProf = function(main, rafraichir){
   var msg=U.qs("#jp-msg",main);
+  var zoneJours = U.qs("#jp-jours",main), nJour = 0;
+  function ajouterLigneJour(){
+    nJour++;
+    var d = document.createElement("div");
+    d.className = "ligne-jour";
+    d.innerHTML = '<span class="num">Jour '+nJour+'</span>'+
+      '<label class="visuellement-cache" for="jp-d'+nJour+'">Date du jour '+nJour+'</label><input type="date" id="jp-d'+nJour+'" data-jour="d">'+
+      '<label class="visuellement-cache" for="jp-a'+nJour+'">Heure de début</label><input type="time" id="jp-a'+nJour+'" data-jour="h1">'+
+      '<span aria-hidden="true">→</span>'+
+      '<label class="visuellement-cache" for="jp-b'+nJour+'">Heure de fin</label><input type="time" id="jp-b'+nJour+'" data-jour="h2">'+
+      (nJour>1 ? '<button type="button" class="puce" data-retirer-jour="1" aria-label="Retirer cette journée">✕</button>' : '');
+    zoneJours.appendChild(d);
+    return d;
+  }
+  function renumeroter(){
+    U.qsa(".ligne-jour",zoneJours).forEach(function(l,i){ U.qs(".num",l).textContent = "Jour "+(i+1); });
+  }
+  ajouterLigneJour();
+  U.qs("#jp-plus-jour",main).addEventListener("click", function(){ ajouterLigneJour(); renumeroter(); });
+  zoneJours.addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-retirer-jour]"); if(!b) return;
+    b.closest(".ligne-jour").remove(); renumeroter();
+  });
+  var selType = U.qs("#jp-type",main), zoneLibre = U.qs("#jp-libre-zone",main);
+  selType.addEventListener("change", function(){ zoneLibre.hidden = selType.value.indexOf("Autre")!==0; if(!zoneLibre.hidden) U.qs("#jp-libre",main).focus(); });
   U.qs("#jp-ajouter",main).addEventListener("click", function(){
-    var nom=U.qs("#jp-etab",main).value.trim(), date=U.qs("#jp-date",main).value;
+    var nom=U.qs("#jp-etab",main).value.trim();
     if(!nom){ msg.textContent="Indiquez l'établissement."; return; }
-    if(!date){ msg.textContent="Indiquez la date."; return; }
     var trouve=null;
     APP.etabs.forEach(function(e){ if(U.sansAccent(e.n+" ("+e.v+")")===U.sansAccent(nom)) trouve=e; });
-    var fin=U.qs("#jp-fin",main).value;
-    if(fin && fin < date){ msg.textContent="La date de fin est antérieure à la date de début."; return; }
-    jpo().push({id:"p"+Date.now().toString(36), etab:trouve?trouve.i:null, nom:trouve?null:nom.slice(0,120), date:date,
-                fin:(fin&&fin!==date)?fin:null, h1:U.qs("#jp-h1",main).value||null, h2:U.qs("#jp-h2",main).value||null,
-                note:U.qs("#jp-note",main).value.slice(0,160)});
+    var jours = U.qsa(".ligne-jour",zoneJours).map(function(l){
+      return {d:U.qs('[data-jour="d"]',l).value, h1:U.qs('[data-jour="h1"]',l).value||null, h2:U.qs('[data-jour="h2"]',l).value||null};
+    }).filter(function(c){ return c.d; });
+    if(!jours.length){ msg.textContent="Indiquez au moins une journée."; return; }
+    var hs = jours.filter(function(c){ return c.h1 && c.h2 && c.h2 < c.h1; });
+    if(hs.length){ msg.textContent="Sur une journée, l'heure de fin précède l'heure de début."; return; }
+    jours.sort(function(a,b){ return a.d.localeCompare(b.d); });
+    var type = selType.value, libre = U.qs("#jp-libre",main).value.trim();
+    var note = type.indexOf("Autre")===0 ? (libre || "Autre") : type + (libre ? " — "+libre : "");
+    jpo().push({id:"p"+Date.now().toString(36), etab:trouve?trouve.i:null, nom:trouve?null:nom.slice(0,120),
+                date:jours[0].d, j:jours, note:note.slice(0,160)});
     APP.store.sauver(); rafraichir();
   });
   U.qs("#jp-export",main).addEventListener("click", function(){
@@ -33682,19 +33718,37 @@ function jourLong(iso){
   var dt=new Date(+p[0], +p[1]-1, +p[2]);
   return JOURS[dt.getDay()]+" "+(+p[2])+" "+MOIS[+p[1]-1]+" "+p[0];
 }
-/* Texte lisible d'une date, sur un jour ou sur plusieurs */
-APP.jpoTexteDate = function(d, longue){
-  var deb = longue ? jourLong(d.date) : dateFr(d.date);
-  var h1 = heureFr(d.h1), h2 = heureFr(d.h2);
-  if(d.fin && d.fin !== d.date){
-    var f = longue ? jourLong(d.fin) : dateFr(d.fin);
-    return "Du "+deb+(h1?" à "+h1:"")+" au "+f+(h2?" à "+h2:"");
-  }
-  var t = (longue ? APP.majuscule(deb) : deb);
+function creneaux(d){
+  if(Array.isArray(d.j) && d.j.length) return d.j;
+  return d.date ? [{d:d.date, h1:d.h1||null, h2:d.h2||null}] : [];
+}
+APP.jpoCreneaux = creneaux;
+function texteCreneau(c, longue){
+  var t = longue ? APP.majuscule(jourLong(c.d)) : dateFr(c.d);
+  var h1 = heureFr(c.h1), h2 = heureFr(c.h2);
   if(h1 && h2) t += ", de "+h1+" à "+h2;
   else if(h1) t += ", à partir de "+h1;
-  else if(d.heure) t += " · "+d.heure;
+  else if(h2) t += ", jusqu'à "+h2;
   return t;
+}
+/* Texte lisible : une journée, ou la liste des journées */
+APP.jpoTexteDate = function(d, longue){
+  var cs = creneaux(d);
+  if(!cs.length) return d.heure || "";
+  if(cs.length === 1){
+    var t = texteCreneau(cs[0], longue);
+    if(!cs[0].h1 && !cs[0].h2 && d.heure) t += " · "+d.heure;
+    return t;
+  }
+  return cs.map(function(c, i){ return "Jour "+(i+1)+" : "+texteCreneau(c, longue); }).join(" ; ");
+};
+/* Version en liste, pour les pages qui ont la place */
+APP.jpoListeJours = function(d, longue){
+  var cs = creneaux(d);
+  if(cs.length < 2) return "";
+  return '<ul class="jours-jpo">'+cs.map(function(c, i){
+    return '<li><strong>Jour '+(i+1)+'</strong> : '+U.esc(texteCreneau(c, longue))+'</li>';
+  }).join("")+'</ul>';
 };
 function moisDe(d){ var p=String(d.date||"").split("-"); return p.length===3 ? MOIS[parseInt(p[1],10)-1]+" "+p[0] : "Date à préciser"; }
 
@@ -33707,7 +33761,8 @@ function vueJpo(main){
   function carte(d){
     var e = d.etab!=null ? APP.parId[d.etab] : null;
     return '<li class="carte-etab"><div><h3>'+(e?'<a href="#/etab/'+e.i+'">'+U.esc(e.n)+'</a>':U.esc(d.nom||"Établissement"))+'</h3>'+
-      '<div class="lieu"><strong>'+U.esc(APP.jpoTexteDate(d, true))+'</strong>'+(e?' · '+U.esc(e.v)+(e.km!=null?' · '+U.esc(APP.distanceTexte(e)):''):'')+'</div>'+
+      '<div class="lieu">'+(APP.jpoCreneaux(d).length>1 ? '<strong>'+U.esc(APP.majuscule(moisDe(d)))+'</strong>' : '<strong>'+U.esc(APP.jpoTexteDate(d, true))+'</strong>')+(e?' · '+U.esc(e.v)+(e.km!=null?' · '+U.esc(APP.distanceTexte(e)):''):'')+'</div>'+
+      APP.jpoListeJours(d, true)+
       (d.note?'<p class="extrait">'+U.esc(d.note)+'</p>':'')+
       '<div class="puces pas-imprimer"><button type="button" class="puce" data-jpo-carnet="'+U.esc(d.id)+'">+ Ajouter à mon carnet</button>'+
       (e&&e.geo?' <a class="puce" href="https://www.openstreetmap.org/?mlat='+e.geo[0]+'&amp;mlon='+e.geo[1]+'#map=15/'+e.geo[0]+'/'+e.geo[1]+'" target="_blank" rel="noopener">Voir le lieu</a>':'')+'</div></div><span></span></li>';
@@ -33996,10 +34051,23 @@ var APP = window.APP, U = APP.u;
 /* ---------- Nettoyage d'une date venue d'un fichier ---------- */
 APP.jpoNettoyer = function(x){
   function txt(v, n){ return v ? String(v).slice(0, n) : null; }
+  var j = [];
+  if(Array.isArray(x.j)){
+    j = x.j.filter(function(c){ return c && c.d; }).slice(0,12).map(function(c){ return {d:txt(c.d,10), h1:txt(c.h1,5), h2:txt(c.h2,5)}; });
+  } else if(x.date){
+    // ancien format : une date, éventuellement une date de fin
+    if(x.fin && x.fin!==x.date){
+      j.push({d:txt(x.date,10), h1:txt(x.h1,5), h2:null});
+      j.push({d:txt(x.fin,10), h1:null, h2:txt(x.h2,5)});
+    } else {
+      j.push({d:txt(x.date,10), h1:txt(x.h1,5), h2:txt(x.h2,5)});
+    }
+  }
+  j.sort(function(a,b){ return String(a.d).localeCompare(String(b.d)); });
   return {id:String(x.id).slice(0,40),
     etab:(typeof x.etab==="number" && APP.parId[x.etab]) ? x.etab : null,
-    nom:txt(x.nom,120), date:txt(x.date,10), fin:txt(x.fin,10),
-    h1:txt(x.h1,5), h2:txt(x.h2,5), heure:txt(x.heure,40), note:txt(x.note,160)};
+    nom:txt(x.nom,120), j:j, date:j.length?j[0].d:txt(x.date,10),
+    heure:txt(x.heure,40), note:txt(x.note,160)};
 };
 
 /* ---------- Dates publiées à côté de l'application ---------- */
@@ -34013,7 +34081,7 @@ function lire(){
     return r.ok ? r.json() : null;
   }).then(function(d){
     if(!d || !Array.isArray(d.dates)) return;
-    var propres = d.dates.filter(function(x){ return x && x.id && x.date; }).map(APP.jpoNettoyer);
+    var propres = d.dates.filter(function(x){ return x && x.id && (x.date || (Array.isArray(x.j) && x.j.length)); }).map(APP.jpoNettoyer);
     if(!propres.length && !APP.JPO_INTEGREES.length) return;
     APP.JPO_INTEGREES = propres;
     APP.JPO_EN_LIGNE = {date:d.cree || null, nb:propres.length};
@@ -34037,6 +34105,13 @@ APP.blocPublier = function(){
    '<div class="champ"><label for="pb-jeton">Jeton d\'accès</label><input type="password" id="pb-jeton" value="'+U.esc(r.jeton)+'" placeholder="github_pat_…" autocomplete="off"></div>'+
   '</div>'+
   '<p><button class="btn" type="button" id="pb-publier">Publier les dates maintenant</button> <span id="pb-msg" role="status" class="source"></span></p>'+
+  '<p class="source">Ces deux informations sont enregistrées sur cet appareil : vous ne les saisissez qu\'une fois. Elles réapparaissent à chaque retour dans l\'Espace professeur.</p>'+
+  '<details class="plus"><summary>Où trouver le nom du dépôt, une seule fois</summary>'+
+   '<ol><li>Ouvrez votre dépôt sur github.com, celui qui contient l\'application.</li>'+
+   '<li>Regardez le titre, tout en haut de la page : il s\'écrit <strong>votre-identifiant / carrefour-orientation</strong>.</li>'+
+   '<li>Recopiez-le ici sous la forme <strong>votre-identifiant/carrefour-orientation</strong>, avec une barre oblique et sans espace.</li>'+
+   '<li>Vous pouvez aussi copier l\'adresse de la page, par exemple <code>https://github.com/votre-identifiant/carrefour-orientation</code>, et la coller telle quelle : le début est retiré automatiquement.</li></ol>'+
+   '<p class="source">Attention aux majuscules : GitHub les distingue. Et prenez le nom du dépôt, pas l\'adresse du site publié en .github.io.</p></details>'+
   '<details class="plus"><summary>Comment obtenir le jeton, une seule fois</summary>'+
    '<ol><li>Sur github.com : votre photo en haut à droite, puis <strong>Settings</strong>.</li>'+
    '<li>Tout en bas à gauche : <strong>Developer settings</strong>, puis <strong>Personal access tokens</strong>, puis <strong>Fine-grained tokens</strong>.</li>'+
@@ -34057,8 +34132,10 @@ APP.brancherPublier = function(main){
     r.jeton = U.qs("#pb-jeton",main).value.trim();
     APP.store.sauver();
   }
-  U.qs("#pb-depot",main).addEventListener("change", memoriser);
-  U.qs("#pb-jeton",main).addEventListener("change", memoriser);
+  ["change","blur","input"].forEach(function(ev){
+    U.qs("#pb-depot",main).addEventListener(ev, memoriser);
+    U.qs("#pb-jeton",main).addEventListener(ev, memoriser);
+  });
   U.qs("#pb-copier",main).addEventListener("click", function(){
     var t = contenuFichier();
     function ok(){ U.qs("#pb-msg2",main).textContent = "Contenu copié : collez-le dans le fichier sur GitHub."; }
