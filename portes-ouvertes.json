@@ -1,6 +1,26 @@
 {
  "type": "carrefour-portes-ouvertes",
  "version": 1,
- "cree": "2026-10-05T00:00:00.000Z",
- "dates": []
+ "cree": "2026-10-06T16:45:53.760Z",
+ "dates": [
+  {
+   "id": "pmuwwowdo",
+   "etab": 112,
+   "nom": null,
+   "date": "2027-01-29",
+   "j": [
+    {
+     "d": "2027-01-29",
+     "h1": "17:00",
+     "h2": "20:00"
+    },
+    {
+     "d": "2027-01-30",
+     "h1": "09:00",
+     "h2": "12:00"
+    }
+   ],
+   "note": "Portes ouvertes"
+  }
+ ]
 }
