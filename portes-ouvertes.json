@@ -1,13 +1,26 @@
 {
  "type": "carrefour-portes-ouvertes",
  "version": 1,
- "cree": "2026-10-06T16:45:53.760Z",
+ "cree": "2026-10-12T13:24:24.774Z",
  "dates": [
+  {
+   "id": "pmv5a7osp",
+   "etab": null,
+   "nom": "CCI Ouest Normandie ; 3 rue Denys Boudard, 61100 La Lande-Patry",
+   "date": "2026-11-06",
+   "j": [
+    {
+     "d": "2026-11-06",
+     "h1": "18:00",
+     "h2": "22:00"
+    }
+   ],
+   "note": "Nuit de l'Orientation"
+  },
   {
    "id": "pmuwwowdo",
    "etab": 112,
    "nom": null,
-   "date": "2027-01-29",
    "j": [
     {
      "d": "2027-01-29",
@@ -20,6 +33,8 @@
      "h2": "12:00"
     }
    ],
+   "date": "2027-01-29",
+   "heure": null,
    "note": "Portes ouvertes"
   }
  ]
