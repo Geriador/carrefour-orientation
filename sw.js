@@ -3,7 +3,10 @@
    soient prises en compte dès qu'une connexion est disponible. */
 var CACHE = "carrefour-orientation-v1";
 var FICHIERS = ["./", "./index.html", "./manifest.webmanifest", "./icone-192.png", "./icone-512.png"];
-var OPTIONNELS = ["./portes-ouvertes.json"];   // peut ne pas exister : son absence ne doit rien casser
+var OPTIONNELS = ["./portes-ouvertes.json",   // peut ne pas exister : son absence ne doit rien casser
+  // polices (v054) : lues à part par la page, gardées pour l'usage hors connexion
+  "./polices/lexend-latin-wght-normal.woff2", "./polices/bricolage-grotesque-latin-opsz-normal.woff2",
+  "./polices/opendyslexic-latin-400-normal.woff2", "./polices/opendyslexic-latin-700-normal.woff2"];
 
 self.addEventListener("install", function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){
