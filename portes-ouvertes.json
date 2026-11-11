@@ -1,7 +1,7 @@
 {
  "type": "carrefour-portes-ouvertes",
  "version": 1,
- "cree": "2026-11-11T09:55:08.499Z",
+ "cree": "2026-11-11T21:25:28.475Z",
  "dates": [
   {
    "id": "pmv7qrwtd",
@@ -46,7 +46,7 @@
    ]
   },
   {
-   "id": "pmwbxwgl9",
+   "id": "pmwcmjui1",
    "etab": null,
    "nom": "Lycée Raymond Queneau",
    "date": "2026-11-30",
@@ -63,6 +63,26 @@
    "geo": [
     49.61208,
     0.76572
+   ]
+  },
+  {
+   "id": "pmwcmm1j1",
+   "etab": null,
+   "nom": "Lycée des Métiers du Bois et de l'Éco-construction",
+   "date": "2026-11-30",
+   "per": {
+    "du": "2026-11-30",
+    "au": "2027-05-01",
+    "js": [],
+    "h1": null,
+    "h2": null
+   },
+   "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
+   "adr": "Rue Général de Gaulle 76630 Envermeu",
+   "v": "Envermeu",
+   "geo": [
+    49.89426,
+    1.26776
    ]
   },
   {
@@ -97,7 +117,27 @@
    ]
   },
   {
-   "id": "pmwbxyl8m",
+   "id": "pmwcmnrb5",
+   "etab": null,
+   "nom": "Lycée des métiers Risle-Seine",
+   "date": "2027-01-04",
+   "per": {
+    "du": "2027-01-04",
+    "au": "2027-05-14",
+    "js": [],
+    "h1": null,
+    "h2": null
+   },
+   "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
+   "adr": "Rue des Déportés 27500 Pont-Audemer",
+   "v": "Pont-Audemer",
+   "geo": [
+    49.35453,
+    0.51769
+   ]
+  },
+  {
+   "id": "pmwcmm1j0",
    "etab": null,
    "nom": "Lycée des Métiers du Bois et de l'Éco-construction",
    "date": "2027-01-23",
@@ -175,9 +215,10 @@
    ]
   },
   {
-   "id": "pmw9i3m1s",
+   "id": "pmwcmjui2",
    "etab": null,
    "nom": "Lycée Raymond Queneau",
+   "date": "2027-02-13",
    "j": [
     {
      "d": "2027-02-13",
@@ -185,8 +226,6 @@
      "h2": "12:00"
     }
    ],
-   "date": "2027-02-13",
-   "heure": null,
    "note": "Portes ouvertes",
    "adr": "Rue Joseph Coddeville 76190 Yvetot",
    "v": "Yvetot",
@@ -196,9 +235,10 @@
    ]
   },
   {
-   "id": "pmw9iaagf",
+   "id": "pmwcmnrb4",
    "etab": null,
    "nom": "Lycée des métiers Risle-Seine",
+   "date": "2027-03-20",
    "j": [
     {
      "d": "2027-03-20",
@@ -206,8 +246,6 @@
      "h2": "17:00"
     }
    ],
-   "date": "2027-03-20",
-   "heure": null,
    "note": "Portes ouvertes",
    "adr": "Rue des Déportés 27500 Pont-Audemer",
    "v": "Pont-Audemer",
