@@ -1,7 +1,7 @@
 {
  "type": "carrefour-portes-ouvertes",
  "version": 1,
- "cree": "2026-11-11T21:25:28.475Z",
+ "cree": "2026-11-16T14:31:58.603Z",
  "dates": [
   {
    "id": "pmv7qrwtd",
@@ -46,43 +46,85 @@
    ]
   },
   {
+   "id": "pmwjczxct",
+   "etab": null,
+   "nom": "Parc Anova",
+   "date": "2026-11-26",
+   "j": [
+    {
+     "d": "2026-11-26",
+     "h1": "18:00",
+     "h2": "21:00"
+    }
+   ],
+   "note": "Salon ou forum des formations — Nuit de l'Orientation",
+   "adr": "Alençon",
+   "v": "Alençon",
+   "geo": [
+    48.42963,
+    0.09201
+   ]
+  },
+  {
    "id": "pmwcmjui1",
    "etab": null,
    "nom": "Lycée Raymond Queneau",
    "date": "2026-11-30",
-   "per": {
-    "du": "2026-11-30",
-    "au": "2027-04-17",
-    "js": [],
-    "h1": null,
-    "h2": null
-   },
+   "heure": null,
    "note": "Mini-stages sur inscription — Inscription auprès du secrétariat du collège",
    "adr": "Rue Joseph Coddeville 76190 Yvetot",
    "v": "Yvetot",
    "geo": [
     49.61208,
     0.76572
-   ]
+   ],
+   "per": {
+    "du": "2026-11-30",
+    "au": "2027-04-17",
+    "js": [],
+    "h1": null,
+    "h2": null
+   }
   },
   {
    "id": "pmwcmm1j1",
    "etab": null,
    "nom": "Lycée des Métiers du Bois et de l'Éco-construction",
    "date": "2026-11-30",
-   "per": {
-    "du": "2026-11-30",
-    "au": "2027-05-01",
-    "js": [],
-    "h1": null,
-    "h2": null
-   },
+   "heure": null,
    "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
    "adr": "Rue Général de Gaulle 76630 Envermeu",
    "v": "Envermeu",
    "geo": [
     49.89426,
     1.26776
+   ],
+   "per": {
+    "du": "2026-11-30",
+    "au": "2027-05-01",
+    "js": [],
+    "h1": null,
+    "h2": null
+   }
+  },
+  {
+   "id": "pmwjd3gwa",
+   "etab": null,
+   "nom": "Lycée des Métiers Augustin Boismard",
+   "date": "2026-12-01",
+   "per": {
+    "du": "2026-12-01",
+    "au": "2027-06-01",
+    "js": [],
+    "h1": null,
+    "h2": null
+   },
+   "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
+   "adr": "Rue Emile Neuville 27800 Brionne",
+   "v": "Brionne",
+   "geo": [
+    49.19787,
+    0.71417
    ]
   },
   {
@@ -121,26 +163,26 @@
    "etab": null,
    "nom": "Lycée des métiers Risle-Seine",
    "date": "2027-01-04",
-   "per": {
-    "du": "2027-01-04",
-    "au": "2027-05-14",
-    "js": [],
-    "h1": null,
-    "h2": null
-   },
+   "heure": null,
    "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
    "adr": "Rue des Déportés 27500 Pont-Audemer",
    "v": "Pont-Audemer",
    "geo": [
     49.35453,
     0.51769
-   ]
+   ],
+   "per": {
+    "du": "2027-01-04",
+    "au": "2027-05-14",
+    "js": [],
+    "h1": null,
+    "h2": null
+   }
   },
   {
    "id": "pmwcmm1j0",
    "etab": null,
    "nom": "Lycée des Métiers du Bois et de l'Éco-construction",
-   "date": "2027-01-23",
    "j": [
     {
      "d": "2027-01-23",
@@ -157,6 +199,8 @@
      "h4": "17:30"
     }
    ],
+   "date": "2027-01-23",
+   "heure": null,
    "note": "Portes ouvertes",
    "adr": "Rue Général de Gaulle 76630 Envermeu",
    "v": "Envermeu",
@@ -218,7 +262,6 @@
    "id": "pmwcmjui2",
    "etab": null,
    "nom": "Lycée Raymond Queneau",
-   "date": "2027-02-13",
    "j": [
     {
      "d": "2027-02-13",
@@ -226,6 +269,8 @@
      "h2": "12:00"
     }
    ],
+   "date": "2027-02-13",
+   "heure": null,
    "note": "Portes ouvertes",
    "adr": "Rue Joseph Coddeville 76190 Yvetot",
    "v": "Yvetot",
@@ -238,7 +283,6 @@
    "id": "pmwcmnrb4",
    "etab": null,
    "nom": "Lycée des métiers Risle-Seine",
-   "date": "2027-03-20",
    "j": [
     {
      "d": "2027-03-20",
@@ -246,12 +290,36 @@
      "h2": "17:00"
     }
    ],
+   "date": "2027-03-20",
+   "heure": null,
    "note": "Portes ouvertes",
    "adr": "Rue des Déportés 27500 Pont-Audemer",
    "v": "Pont-Audemer",
    "geo": [
     49.35453,
     0.51769
+   ]
+  },
+  {
+   "id": "pmwjd3gw9",
+   "etab": null,
+   "nom": "Lycée des Métiers Augustin Boismard",
+   "date": "2027-03-20",
+   "j": [
+    {
+     "d": "2027-03-20",
+     "h1": "10:00",
+     "h2": "12:00",
+     "h3": "13:30",
+     "h4": "17:00"
+    }
+   ],
+   "note": "Portes ouvertes",
+   "adr": "Rue Emile Neuville 27800 Brionne",
+   "v": "Brionne",
+   "geo": [
+    49.19787,
+    0.71417
    ]
   }
  ]
