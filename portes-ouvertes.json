@@ -1,7 +1,7 @@
 {
  "type": "carrefour-portes-ouvertes",
  "version": 1,
- "cree": "2026-11-16T14:31:58.603Z",
+ "cree": "2026-11-25T16:05:02.843Z",
  "dates": [
   {
    "id": "pmv7qrwtd",
@@ -49,7 +49,6 @@
    "id": "pmwjczxct",
    "etab": null,
    "nom": "Parc Anova",
-   "date": "2026-11-26",
    "j": [
     {
      "d": "2026-11-26",
@@ -57,6 +56,8 @@
      "h2": "21:00"
     }
    ],
+   "date": "2026-11-26",
+   "heure": null,
    "note": "Salon ou forum des formations — Nuit de l'Orientation",
    "adr": "Alençon",
    "v": "Alençon",
@@ -112,20 +113,35 @@
    "etab": null,
    "nom": "Lycée des Métiers Augustin Boismard",
    "date": "2026-12-01",
-   "per": {
-    "du": "2026-12-01",
-    "au": "2027-06-01",
-    "js": [],
-    "h1": null,
-    "h2": null
-   },
+   "heure": null,
    "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
    "adr": "Rue Emile Neuville 27800 Brionne",
    "v": "Brionne",
    "geo": [
     49.19787,
     0.71417
-   ]
+   ],
+   "per": {
+    "du": "2026-12-01",
+    "au": "2027-06-01",
+    "js": [],
+    "h1": null,
+    "h2": null
+   }
+  },
+  {
+   "id": "pmwwb9glc",
+   "etab": 112,
+   "nom": null,
+   "date": "2026-12-07",
+   "per": {
+    "du": "2026-12-07",
+    "au": "2027-04-16",
+    "js": [],
+    "h1": null,
+    "h2": null
+   },
+   "note": "Mini-stages sur inscription — Inscription auprès du secrétariat"
   },
   {
    "id": "pmw9i0tkt",
@@ -180,6 +196,28 @@
    }
   },
   {
+   "id": "pmwwbdrqi",
+   "etab": null,
+   "nom": "AgroCampus CFA La Germinière",
+   "date": "2027-01-06",
+   "per": {
+    "du": "2027-01-06",
+    "au": "2027-04-14",
+    "js": [
+     3
+    ],
+    "h1": "09:00",
+    "h2": "16:10"
+   },
+   "note": "Mini-stages sur inscription — Inscription auprès du secrétariat",
+   "adr": "Rouillon",
+   "v": "Rouillon",
+   "geo": [
+    47.99559,
+    0.14141
+   ]
+  },
+  {
    "id": "pmwcmm1j0",
    "etab": null,
    "nom": "Lycée des Métiers du Bois et de l'Éco-construction",
@@ -210,6 +248,31 @@
    ]
   },
   {
+   "id": "pmwwbbdyb",
+   "etab": null,
+   "nom": "Lycée Professionnel et Technologique Notre-Dame de Nazareth",
+   "date": "2027-01-23",
+   "j": [
+    {
+     "d": "2027-01-23",
+     "h1": "09:00",
+     "h2": "13:00"
+    },
+    {
+     "d": "2027-04-03",
+     "h1": "09:00",
+     "h2": "13:00"
+    }
+   ],
+   "note": "Portes ouvertes",
+   "adr": "20 Rue de l'Arbalète 14440 Douvres-la-Délivrande",
+   "v": "Douvres-la-Délivrande",
+   "geo": [
+    49.29592,
+    -0.372
+   ]
+  },
+  {
    "id": "pmuwwowdo",
    "etab": 112,
    "nom": null,
@@ -231,6 +294,25 @@
    "adr": null,
    "v": null,
    "geo": null
+  },
+  {
+   "id": "pmwwb9glb",
+   "etab": 112,
+   "nom": null,
+   "date": "2027-01-29",
+   "j": [
+    {
+     "d": "2027-01-29",
+     "h1": "17:00",
+     "h2": "20:00"
+    },
+    {
+     "d": "2027-01-30",
+     "h1": "09:00",
+     "h2": "12:00"
+    }
+   ],
+   "note": "Portes ouvertes"
   },
   {
    "id": "pmw9ibtmo",
@@ -256,6 +338,36 @@
    "geo": [
     48.85787,
     -0.87685
+   ]
+  },
+  {
+   "id": "pmwwb6ln9",
+   "etab": null,
+   "nom": "Pôle Formation UIMM Grand Ouest Normandie",
+   "date": "2027-02-06",
+   "j": [
+    {
+     "d": "2027-02-06",
+     "h1": "09:00",
+     "h2": "13:00"
+    },
+    {
+     "d": "2027-04-03",
+     "h1": "09:00",
+     "h2": "13:00"
+    },
+    {
+     "d": "2027-06-12",
+     "h1": "09:00",
+     "h2": "13:00"
+    }
+   ],
+   "note": "Portes ouvertes",
+   "adr": "12 Rue Professeur Joseph Rousselot 14000 Caen",
+   "v": "Caen",
+   "geo": [
+    49.20762,
+    -0.35873
    ]
   },
   {
@@ -304,7 +416,6 @@
    "id": "pmwjd3gw9",
    "etab": null,
    "nom": "Lycée des Métiers Augustin Boismard",
-   "date": "2027-03-20",
    "j": [
     {
      "d": "2027-03-20",
@@ -314,6 +425,8 @@
      "h4": "17:00"
     }
    ],
+   "date": "2027-03-20",
+   "heure": null,
    "note": "Portes ouvertes",
    "adr": "Rue Emile Neuville 27800 Brionne",
    "v": "Brionne",
